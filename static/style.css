@@ -1,0 +1,330 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Space+Grotesk:wght@400;600;700&display=swap");
+
+:root {
+    --bg: #0b0f1a;
+    --bg-accent: #1d2740;
+    --card: rgba(255, 255, 255, 0.08);
+    --card-strong: rgba(255, 255, 255, 0.12);
+    --text: #f5f4ef;
+    --muted: #c5c2bb;
+    --accent: #ff914d;
+    --accent-2: #59d6c7;
+    --accent-3: #ffc857;
+    --shadow: 0 24px 48px rgba(6, 10, 20, 0.45);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Space Grotesk", sans-serif;
+    color: var(--text);
+    background: radial-gradient(circle at top, #1b2338 0%, var(--bg) 45%, #070a12 100%);
+    min-height: 100vh;
+}
+
+.ambient {
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 15% 20%, rgba(255, 145, 77, 0.2), transparent 45%),
+        radial-gradient(circle at 80% 10%, rgba(89, 214, 199, 0.15), transparent 35%),
+        radial-gradient(circle at 70% 70%, rgba(255, 200, 87, 0.12), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.hero {
+    padding: 4.5rem 1.5rem 3rem;
+    position: relative;
+    z-index: 1;
+}
+
+.hero.small {
+    padding-bottom: 2rem;
+}
+
+.hero-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.eyebrow {
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: var(--accent-2);
+}
+
+h1 {
+    font-family: "Playfair Display", serif;
+    font-size: clamp(2.4rem, 3vw, 3.6rem);
+    margin: 0.6rem 0 1rem;
+}
+
+h2 {
+    font-size: 1.35rem;
+    margin: 0 0 1rem;
+}
+
+.subtitle {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 680px;
+}
+
+.container {
+    width: min(1100px, 92vw);
+    margin: 0 auto 4rem;
+    position: relative;
+    z-index: 1;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 1.6rem;
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card.highlight {
+    background: linear-gradient(140deg, rgba(255, 145, 77, 0.15), rgba(89, 214, 199, 0.1));
+}
+
+.card.alert {
+    border: 1px solid rgba(255, 145, 77, 0.5);
+    color: #ffd7c2;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.field span {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--muted);
+}
+
+input[type="file"],
+textarea {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.9rem 1rem;
+    font-family: inherit;
+    background: rgba(15, 20, 32, 0.8);
+    color: var(--text);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 170px;
+}
+
+.cta {
+    padding: 0.85rem 1.4rem;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(120deg, var(--accent), var(--accent-3));
+    color: #1b1210;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+.cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 32px rgba(255, 145, 77, 0.3);
+}
+
+.cta.secondary {
+    margin-top: 1.2rem;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06));
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.2rem;
+    color: var(--muted);
+    display: grid;
+    gap: 0.7rem;
+}
+
+.pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.pill {
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    font-size: 0.85rem;
+}
+
+.info-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.label {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin: 0 0 0.3rem;
+}
+
+.value {
+    margin: 0;
+    font-weight: 600;
+}
+
+.gauge-card {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+}
+
+.gauge {
+    --score: 0;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--accent) calc(var(--score) * 1%),
+        rgba(255, 255, 255, 0.12) 0
+    );
+    display: grid;
+    place-items: center;
+    margin: 0 auto;
+}
+
+.gauge-center {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(7, 10, 18, 0.9);
+    display: grid;
+    place-items: center;
+    text-align: center;
+}
+
+.score {
+    font-size: 2rem;
+    margin: 0;
+    font-weight: 700;
+}
+
+.score-label {
+    color: var(--muted);
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.meter-group {
+    display: grid;
+    gap: 1rem;
+}
+
+.meter-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.meter-bar {
+    height: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.meter-fill {
+    height: 100%;
+    background: linear-gradient(120deg, var(--accent), var(--accent-3));
+}
+
+.meter-fill.alt {
+    background: linear-gradient(120deg, var(--accent-2), #6ab7ff);
+}
+
+.math-details {
+    margin-top: 1rem;
+    color: var(--muted);
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.tag {
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.tag.success {
+    background: rgba(89, 214, 199, 0.2);
+    color: #c8fff7;
+}
+
+.tag.warn {
+    background: rgba(255, 145, 77, 0.22);
+    color: #ffd7c2;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.category-card {
+    background: var(--card-strong);
+    border-radius: 18px;
+    padding: 1rem;
+}
+
+.muted {
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+@media (max-width: 720px) {
+    .gauge {
+        width: 180px;
+        height: 180px;
+    }
+
+    .gauge-center {
+        width: 130px;
+        height: 130px;
+    }
+}

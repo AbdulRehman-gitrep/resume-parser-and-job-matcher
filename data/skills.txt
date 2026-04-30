@@ -1,0 +1,71 @@
+[Programming Languages]
+Python
+Java
+JavaScript
+TypeScript
+C
+C++
+C#
+Go
+Rust
+SQL
+
+[Web Frameworks]
+Flask
+Django
+FastAPI
+Express.js
+Node.js
+React
+Angular
+Vue
+
+[Databases]
+PostgreSQL
+MySQL
+SQLite
+MongoDB
+Redis
+Elasticsearch
+
+[Cloud Platforms]
+AWS
+Azure
+Google Cloud
+Docker
+Kubernetes
+
+[DevOps]
+CI/CD
+GitHub Actions
+Jenkins
+Terraform
+Ansible
+
+[Data Science]
+Pandas
+NumPy
+scikit-learn
+Data Visualization
+Statistics
+
+[NLP]
+spaCy
+NLTK
+TF-IDF
+Tokenization
+Named Entity Recognition
+
+[Tools]
+Git
+Linux
+Bash
+VS Code
+JIRA
+
+[Concepts]
+REST
+RESTful
+Microservices
+OOP
+Agile

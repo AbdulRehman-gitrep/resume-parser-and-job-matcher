@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Match Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <div class="ambient"></div>
+    <header class="hero small">
+        <div class="hero-content">
+            <p class="eyebrow">Match Results</p>
+            <h1>Your resume match analysis</h1>
+            <p class="subtitle">A clear breakdown of similarity, skills, and scoring.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="grid">
+            <div class="card">
+                <h2>Resume info</h2>
+                <div class="info-grid">
+                    <div>
+                        <p class="label">Name</p>
+                        <p class="value">{{ resume_name or "Not detected" }}</p>
+                    </div>
+                    <div>
+                        <p class="label">Organizations</p>
+                        <p class="value">{{ organizations | join(', ') if organizations else "None" }}</p>
+                    </div>
+                    <div>
+                        <p class="label">Dates</p>
+                        <p class="value">{{ dates | join(', ') if dates else "None" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card gauge-card">
+                <h2>Final score</h2>
+                <div class="gauge" style="--score: {{ final_score_pct }};">
+                    <div class="gauge-center">
+                        <p class="score">{{ final_score_pct }}%</p>
+                        <p class="score-label">Overall match</p>
+                    </div>
+                </div>
+                <div class="pill-row">
+                    <span class="pill">Similarity {{ similarity_pct }}%</span>
+                    <span class="pill">Skill ratio {{ skill_ratio_pct }}%</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Weighted scoring</h2>
+            <div class="meter-group">
+                <div class="meter">
+                    <div class="meter-label">
+                        <span>Similarity (60%)</span>
+                        <span>{{ similarity_weighted_pct }} pts</span>
+                    </div>
+                    <div class="meter-bar">
+                        <div class="meter-fill" style="width: {{ similarity_weighted_pct }}%;"></div>
+                    </div>
+                </div>
+                <div class="meter">
+                    <div class="meter-label">
+                        <span>Skill ratio (40%)</span>
+                        <span>{{ skill_weighted_pct }} pts</span>
+                    </div>
+                    <div class="meter-bar">
+                        <div class="meter-fill alt" style="width: {{ skill_weighted_pct }}%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <details class="math-details">
+                <summary>Show score math</summary>
+                <p>{{ final_score_formula }}</p>
+            </details>
+            <a class="cta secondary" href="/">Analyze another</a>
+        </section>
+
+        <section class="grid">
+            <div class="card">
+                <h2>Matched skills</h2>
+                <div class="tag-list">
+                    {% for skill in matched_skills %}
+                    <span class="tag success">{{ skill }}</span>
+                    {% else %}
+                    <p>No matched skills found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="card">
+                <h2>Missing skills</h2>
+                <div class="tag-list">
+                    {% for skill in missing_skills %}
+                    <span class="tag warn">{{ skill }}</span>
+                    {% else %}
+                    <p>No missing skills detected.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Category breakdown</h2>
+            <div class="category-grid">
+                {% for item in category_breakdown %}
+                <div class="category-card">
+                    <h3>{{ item.category }}</h3>
+                    <p class="label">Matched</p>
+                    <div class="tag-list">
+                        {% for skill in item.matched %}
+                        <span class="tag success">{{ skill }}</span>
+                        {% else %}
+                        <span class="muted">None</span>
+                        {% endfor %}
+                    </div>
+                    <p class="label">Missing</p>
+                    <div class="tag-list">
+                        {% for skill in item.missing %}
+                        <span class="tag warn">{{ skill }}</span>
+                        {% else %}
+                        <span class="muted">None</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>

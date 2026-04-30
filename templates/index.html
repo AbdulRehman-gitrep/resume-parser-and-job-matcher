@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume Parser and Job Matcher</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <div class="ambient"></div>
+    <header class="hero">
+        <div class="hero-content">
+            <p class="eyebrow">Resume Parser and Job Matcher</p>
+            <h1>Turn resumes into clear match signals.</h1>
+            <p class="subtitle">
+                Upload a resume, paste a job description, and get a crisp breakdown of skills,
+                entity signals, and a weighted match score.
+            </p>
+        </div>
+    </header>
+
+    <main class="container">
+        {% if error %}
+        <div class="card alert">
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+
+        <section class="grid">
+            <div class="card">
+                <h2>Analyze a Resume</h2>
+                <form action="/analyze" method="post" enctype="multipart/form-data" class="form">
+                    <label class="field">
+                        <span>Resume file (PDF or DOCX)</span>
+                        <input type="file" name="resume" required />
+                    </label>
+                    <label class="field">
+                        <span>Job description</span>
+                        <textarea name="job_description" rows="8" placeholder="Paste the role requirements, responsibilities, and must-have skills..." required></textarea>
+                    </label>
+                    <button class="cta" type="submit">Analyze Match</button>
+                </form>
+            </div>
+
+            <div class="card highlight">
+                <h2>What you get</h2>
+                <ul class="benefits">
+                    <li>Named entities like candidate name, organizations, and dates.</li>
+                    <li>Skill matching across categories with gaps called out.</li>
+                    <li>TF-IDF similarity plus weighted scoring math.</li>
+                    <li>Visual gauges, meters, and a clear final score.</li>
+                </ul>
+                <div class="pill-row">
+                    <span class="pill">spaCy NER</span>
+                    <span class="pill">TF-IDF</span>
+                    <span class="pill">Skill Graph</span>
+                    <span class="pill">No DL Models</span>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
