@@ -3,17 +3,15 @@ import os
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 
-from src.cleaner import clean_text
 from src.extractor import extract_text
 from src.matcher import compute_similarity
 from src.parser import parse_entities
 from src.scorer import calculate_score
-from src.skills import extract_skills_by_category, flatten_skills, load_skills
+from src.skills import extract_skills
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
-SKILLS_PATH = os.path.join(BASE_DIR, "data", "skills.txt")
 ALLOWED_EXTENSIONS = {".pdf", ".docx"}
 
 app = Flask(__name__)
@@ -56,9 +54,6 @@ def analyze():
             error=f"Failed to extract resume text: {exc}",
         )
 
-    cleaned_resume = clean_text(resume_text)
-    cleaned_job = clean_text(job_description)
-
     try:
         entities = parse_entities(resume_text)
     except Exception as exc:
@@ -67,21 +62,24 @@ def analyze():
             error=str(exc),
         )
 
-    skills_by_category = load_skills(SKILLS_PATH)
-    resume_skills_by_category = extract_skills_by_category(cleaned_resume, skills_by_category)
-    job_skills_by_category = extract_skills_by_category(cleaned_job, skills_by_category)
+    resume_skill_result = extract_skills(resume_text)
+    job_skill_result = extract_skills(job_description)
 
-    resume_skills = flatten_skills(resume_skills_by_category)
-    job_skills = flatten_skills(job_skills_by_category)
+    resume_skills = sorted({skill for skill, _ in resume_skill_result["matched"]})
+    job_skills = sorted({skill for skill, _ in job_skill_result["matched"]})
 
     matched_skills = sorted(set(resume_skills) & set(job_skills))
     missing_skills = sorted(set(job_skills) - set(resume_skills))
 
-    similarity = compute_similarity(cleaned_resume, cleaned_job)
-    score_data = calculate_score(similarity, matched_skills, len(job_skills))
+    similarity_result = compute_similarity(resume_text, job_description)
+    similarity_score = similarity_result["score"]
+    score_data = calculate_score(similarity_score, matched_skills, len(job_skills))
 
-    similarity_pct = round(similarity * 100, 2)
-    similarity_weighted = similarity * 0.6
+    similarity_pct = similarity_result["percentage"]
+    similarity_method = similarity_result["method"]
+    tfidf_pct = similarity_result["tfidf_percentage"]
+
+    similarity_weighted = similarity_score * 0.6
     similarity_weighted_pct = round(similarity_weighted * 100, 2)
 
     skill_ratio = score_data["skill_ratio"]
@@ -97,9 +95,8 @@ def analyze():
     )
 
     category_breakdown = []
-    for category in skills_by_category:
-        job_cat = job_skills_by_category.get(category, [])
-        resume_cat = resume_skills_by_category.get(category, [])
+    for category, job_cat in job_skill_result["by_category"].items():
+        resume_cat = resume_skill_result["by_category"].get(category, [])
         matched_cat = sorted(set(job_cat) & set(resume_cat))
         missing_cat = sorted(set(job_cat) - set(resume_cat))
         if not job_cat:
@@ -118,6 +115,8 @@ def analyze():
         organizations=entities.get("organizations"),
         dates=entities.get("dates"),
         similarity_pct=similarity_pct,
+        similarity_method=similarity_method,
+        tfidf_pct=tfidf_pct,
         similarity_weighted_pct=similarity_weighted_pct,
         skill_ratio_pct=skill_ratio_pct,
         skill_weighted_pct=skill_weighted_pct,
@@ -128,6 +127,9 @@ def analyze():
         resume_skills=resume_skills,
         job_skills=job_skills,
         category_breakdown=category_breakdown,
+        job_titles=entities.get("job_titles"),
+        tech_skills=entities.get("tech_skills"),
+        degrees=entities.get("degrees"),
     )
 
 

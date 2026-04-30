@@ -33,6 +33,18 @@
                         <p class="label">Dates</p>
                         <p class="value">{{ dates | join(', ') if dates else "None" }}</p>
                     </div>
+                    <div>
+                        <p class="label">Job titles</p>
+                        <p class="value">{{ job_titles | join(', ') if job_titles else "None" }}</p>
+                    </div>
+                    <div>
+                        <p class="label">Tech skills</p>
+                        <p class="value">{{ tech_skills | join(', ') if tech_skills else "None" }}</p>
+                    </div>
+                    <div>
+                        <p class="label">Degrees</p>
+                        <p class="value">{{ degrees | join(', ') if degrees else "None" }}</p>
+                    </div>
                 </div>
             </div>
 
@@ -47,6 +59,8 @@
                 <div class="pill-row">
                     <span class="pill">Similarity {{ similarity_pct }}%</span>
                     <span class="pill">Skill ratio {{ skill_ratio_pct }}%</span>
+                    <span class="pill">Method {{ similarity_method }}</span>
+                    <span class="pill">TF-IDF {{ tfidf_pct }}%</span>
                 </div>
             </div>
         </section>

@@ -1,52 +1,99 @@
-import math
+"""
+matcher_improved.py
+-------------------
+Addresses Limitation #1: TF-IDF misses semantic meaning.
 
-import numpy as np
+Improvement: Uses sentence-transformers (all-MiniLM-L6-v2) for semantic
+similarity. Falls back to TF-IDF cosine similarity if the library is
+unavailable, preserving the original behavior.
+"""
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# --- Attempt to load sentence-transformers ---
+try:
+    from sentence_transformers import SentenceTransformer, util as st_util
+
+    _MODEL = SentenceTransformer("all-MiniLM-L6-v2")
+    _USE_SEMANTIC = True
+    print("[matcher] Using semantic similarity (sentence-transformers).")
+except ImportError:
+    _MODEL = None
+    _USE_SEMANTIC = False
+    print("[matcher] sentence-transformers not found. Falling back to TF-IDF.")
 
 
-def compute_similarity(resume_text, job_text):
-    if not resume_text or not job_text:
-        return 0.0
+def semantic_similarity(text1: str, text2: str) -> float:
+    """
+    Compute semantic similarity using sentence embeddings.
+    Returns a float in [0, 1].
+    """
+    emb1, emb2 = _MODEL.encode([text1, text2], convert_to_tensor=True)
+    score = st_util.cos_sim(emb1, emb2).item()
+    return round(max(0.0, min(1.0, score)), 4)
 
+
+def tfidf_similarity(text1: str, text2: str) -> float:
+    """
+    Compute TF-IDF cosine similarity (original approach).
+    Returns a float in [0, 1].
+    """
+    vectorizer = TfidfVectorizer()
     try:
-        from sklearn.feature_extraction.text import TfidfVectorizer
-        from sklearn.metrics.pairwise import cosine_similarity
-
-        vectorizer = TfidfVectorizer()
-        tfidf = vectorizer.fit_transform([resume_text, job_text])
-        score = cosine_similarity(tfidf[0], tfidf[1])[0][0]
-        return float(score)
+        tfidf_matrix = vectorizer.fit_transform([text1, text2])
+        score = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
+        return round(float(score), 4)
     except Exception:
-        return _numpy_tfidf_cosine(resume_text, job_text)
-
-
-def _numpy_tfidf_cosine(text_a, text_b):
-    tokens_a = text_a.split()
-    tokens_b = text_b.split()
-    vocab = sorted(set(tokens_a) | set(tokens_b))
-    if not vocab:
         return 0.0
 
-    tf_a = _term_frequency(tokens_a, vocab)
-    tf_b = _term_frequency(tokens_b, vocab)
 
-    doc_count = np.array([
-        int(token in tokens_a) + int(token in tokens_b) for token in vocab
-    ])
-    idf = np.log((1 + 2) / (1 + doc_count)) + 1
+def compute_similarity(resume_text: str, job_text: str) -> dict:
+    """
+    Main entry point.
 
-    tfidf_a = tf_a * idf
-    tfidf_b = tf_b * idf
+    Returns a dict with:
+        - method       : 'semantic' | 'tfidf'
+        - score        : float [0, 1]
+        - percentage   : float [0, 100]
+        - tfidf_score  : float (always computed for comparison)
+    """
+    if not resume_text or not job_text:
+        return {
+            "method": "tfidf",
+            "score": 0.0,
+            "percentage": 0.0,
+            "tfidf_score": 0.0,
+            "tfidf_percentage": 0.0,
+        }
 
-    denom = (np.linalg.norm(tfidf_a) * np.linalg.norm(tfidf_b))
-    if denom == 0:
-        return 0.0
-    return float(np.dot(tfidf_a, tfidf_b) / denom)
+    tfidf_score = tfidf_similarity(resume_text, job_text)
+
+    if _USE_SEMANTIC:
+        sem_score = semantic_similarity(resume_text, job_text)
+        return {
+            "method": "semantic",
+            "score": sem_score,
+            "percentage": round(sem_score * 100, 2),
+            "tfidf_score": tfidf_score,
+            "tfidf_percentage": round(tfidf_score * 100, 2),
+        }
+
+    return {
+        "method": "tfidf",
+        "score": tfidf_score,
+        "percentage": round(tfidf_score * 100, 2),
+        "tfidf_score": tfidf_score,
+        "tfidf_percentage": round(tfidf_score * 100, 2),
+    }
 
 
-def _term_frequency(tokens, vocab):
-    counts = {token: 0 for token in vocab}
-    for token in tokens:
-        if token in counts:
-            counts[token] += 1
-    max_count = max(counts.values()) if counts else 1
-    return np.array([counts[token] / max_count for token in vocab], dtype=float)
+if __name__ == "__main__":
+    resume = "Experienced Python developer with skills in machine learning and data analysis."
+    job = "Looking for an ML engineer proficient in Python and statistical modelling."
+
+    result = compute_similarity(resume, job)
+    print(f"Method     : {result['method']}")
+    print(f"Score      : {result['score']}")
+    print(f"Percentage : {result['percentage']}%")
+    print(f"TF-IDF     : {result['tfidf_percentage']}%")
